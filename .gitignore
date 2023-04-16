@@ -54,3 +54,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### db credentials ###
+src/main/resources/config/db.properties
