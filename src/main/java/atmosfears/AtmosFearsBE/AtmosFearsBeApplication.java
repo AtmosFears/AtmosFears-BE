@@ -10,6 +10,5 @@ public class AtmosFearsBeApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(AtmosFearsBeApplication.class, args);
-
 	}
 }
