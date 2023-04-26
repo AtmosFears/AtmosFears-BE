@@ -17,6 +17,10 @@ Just run `sudo apt install maven`, and make sure your java version is 17.
 
 If you want the newest version of maven check [this](https://www.digitalocean.com/community/tutorials/install-maven-linux-ubuntu)
 
+# MongoDB setup
+1. Create a copy of `db.example.properties` as `db.properties`
+2. Fill credentials
+
 # Useful commands
 Running app (it also recompile your changes):
 
