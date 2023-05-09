@@ -15,7 +15,7 @@ import java.util.stream.DoubleStream;
 @Service
 public class Predictor {
 
-    public static List<Double> predict(String csv_file_path){
+    public List<Double> predict(String csv_file_path){
 
         // TODO odpalanie wspólnego rCallera dla wszystkich wywołań predict'u
 
@@ -67,8 +67,7 @@ public class Predictor {
             Logger.getLogger(examples.Main.class.getName()).log(Level.SEVERE, e.getMessage());
         }
 
-        // RETURN -1 IN CASE OF ERROR
-        return new ArrayList<>(Arrays.asList(-1.0));
+        return null;
     }
 
 }
