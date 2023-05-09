@@ -1,22 +1,29 @@
-package atmosfears.AtmosFearsBE.model;
+package atmosfears.AtmosFearsBE.service;
 
 import com.github.rcaller.rstuff.RCaller;
 import com.github.rcaller.rstuff.RCode;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
+@Service
 public class Predictor {
 
-    public static double[] predict(String csv_file_path){
+    public static List<Double> predict(String csv_file_path){
 
         // TODO odpalanie wspólnego rCallera dla wszystkich wywołań predict'u
 
         // MODEL WILL NOT WORK IF THE NECESSARY R PACKAGES ARE NOT INSTALLED ALONGSIDE R ITSELF
-        // For detail about how to install the packages refer to Rsetup.txt file in the project sources
+        // For detail about how to install the packages refer to README
 
         // EXAMPLE OF ARGUMENTS IN USE:
-        // double[] pred = Predictor.predict("src/main/data/dane_sensora_ops.csv");
+        // double[] pred = Predictor.predict("src/main/data/example_sensor_data.csv");
 
         try{
 
@@ -52,7 +59,8 @@ public class Predictor {
             // RETRIEVING RESULT
             rCaller.setRCode(code);
             rCaller.runAndReturnResult("out");
-            return rCaller.getParser().getAsDoubleArray("_pred");
+            return DoubleStream.of( rCaller.getParser().getAsDoubleArray("_pred") ).boxed().collect(Collectors.toCollection(ArrayList::new));
+
 
         }
         catch (Exception e) {
@@ -60,7 +68,7 @@ public class Predictor {
         }
 
         // RETURN -1 IN CASE OF ERROR
-        return new double[]{-1};
+        return new ArrayList<>(Arrays.asList(-1.0));
     }
 
 }
