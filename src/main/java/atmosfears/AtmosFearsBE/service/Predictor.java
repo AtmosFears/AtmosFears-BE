@@ -5,7 +5,6 @@ import com.github.rcaller.rstuff.RCode;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,7 +22,8 @@ public class Predictor {
         // For detail about how to install the packages refer to README
 
         // EXAMPLE OF ARGUMENTS IN USE:
-        // double[] pred = Predictor.predict("src/main/data/example_sensor_data.csv");
+        // Predictor predictor = new Predictor();
+        // List<Double> pred = predictor.predict("src/main/data/example_sensor_data.csv");
 
         try{
 
