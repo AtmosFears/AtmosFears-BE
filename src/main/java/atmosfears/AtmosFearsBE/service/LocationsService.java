@@ -18,11 +18,6 @@ public class LocationsService {
     private final String LOCATIONS_DIR = "locations/";
     private final String delimiter = ";";
 
-    /**
-     * Collect the data from all the available devices and save it to separate csv files.
-     * For now it mocks the process of loading the data - it is always loaded from specified file.
-     * @return List of files that were loaded inside
-     */
     public List<Location> getLocations() {
         try {
             List<Location> locations = new LinkedList<>();

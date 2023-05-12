@@ -17,5 +17,10 @@ public class AirParticulates {
     private String deviceLocation;
     private double pm10Quantity;
 
+    public AirParticulates(String deviceLocation, double pm10Quantity) {
+        this.deviceLocation = deviceLocation;
+        this.pm10Quantity = pm10Quantity;
+    }
+
     //TODO check what data is needed and fix it. It is only an example. Try to do automatic ID creation
 }
