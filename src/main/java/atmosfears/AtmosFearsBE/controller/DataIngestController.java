@@ -32,7 +32,7 @@ public class DataIngestController {
     Set<String> dataFiles = dataLoadService.collectAndSaveData();
     for(String file : dataFiles) {
       AirParticulatesFile airParticulatesFile = calculationService.getPredictionsForFile(file);
-      airParticulatesService.saveFile(airParticulatesFile);
+//      airParticulatesService.saveFile(airParticulatesFile);
     }
     return ResponseEntity.ok("Data ingested!");
   }

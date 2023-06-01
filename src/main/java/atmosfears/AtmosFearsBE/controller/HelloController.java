@@ -4,6 +4,8 @@ import atmosfears.AtmosFearsBE.service.AirParticulatesService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
+
 @RestController
 public class HelloController {
 
@@ -15,7 +17,8 @@ public class HelloController {
 
     @GetMapping("/")
     public String index() {
-        return "Greetings from Spring Boot! <br> Repository findAll result: " + airParticulatesService.findAll();
+        return "Greetings from Spring Boot! <br> Repository getAverage result: " +
+                airParticulatesService.getAverageParticulatesValues(new Date("01/01/2021 00:00:00"), new Date("01/01/2021 04:00:00"));
     }
 
 }
