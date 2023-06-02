@@ -4,6 +4,7 @@ import atmosfears.AtmosFearsBE.database.AirParticulatesRepository;
 import atmosfears.AtmosFearsBE.database.Particulate;
 import atmosfears.AtmosFearsBE.database.SensorCode;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
+import atmosfears.AtmosFearsBE.model.AggregatedParticulates;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
@@ -64,7 +65,7 @@ public class AirParticulatesService {
         return json;
     }
 
-    public List<AirParticulates> findByDateBetweenAndSensorCodeIn(Date from, Date to, List<SensorCode> sensorCodes) {
-        return airParticulatesRepository.findByDateBetweenAndSensorCodeIn(from, to, sensorCodes);
+    public List<AggregatedParticulates> findByDateBetweenAndSensorCodeIn(Date from, Date to, List<SensorCode> sensorCodes) {
+        return airParticulatesRepository.aggregateByDay(from, to, sensorCodes);
     }
 }
