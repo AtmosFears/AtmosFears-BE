@@ -2,6 +2,7 @@ package atmosfears.AtmosFearsBE.service;
 
 import atmosfears.AtmosFearsBE.database.AirParticulatesRepository;
 import atmosfears.AtmosFearsBE.database.Particulate;
+import atmosfears.AtmosFearsBE.database.SensorCode;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -61,5 +62,9 @@ public class AirParticulatesService {
                 json.put(p.name(), averages.get(p).getValue()));
 
         return json;
+    }
+
+    public List<AirParticulates> findByDateBetweenAndSensorCodeIn(Date from, Date to, List<SensorCode> sensorCodes) {
+        return airParticulatesRepository.findByDateBetweenAndSensorCodeIn(from, to, sensorCodes);
     }
 }
