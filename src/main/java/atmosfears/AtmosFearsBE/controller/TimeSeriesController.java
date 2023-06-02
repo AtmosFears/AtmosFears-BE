@@ -86,7 +86,7 @@ public class TimeSeriesController {
             json.append("lines", line2);
 
             JSONObject rightAxis = new JSONObject();
-            leftAxis.put("label", particulate2.getDisplayName());
+            rightAxis.put("label", particulate2.getDisplayName());
             json.put("rightAxis", rightAxis);
         }
 
