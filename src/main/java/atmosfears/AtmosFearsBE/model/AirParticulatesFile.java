@@ -7,8 +7,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-//TODO  DELETE THIS
-//@Document(collection = "air_particulates")
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AirParticulatesFile {
