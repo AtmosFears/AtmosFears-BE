@@ -45,6 +45,12 @@
 			<optional>true</optional>
 		</dependency>
 
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20230227</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/com.github.jbytecode/RCaller -->
 		<dependency>
 			<groupId>com.github.jbytecode</groupId>
