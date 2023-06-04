@@ -33,6 +33,8 @@ public class TimeSeriesController {
             JSONObject locationInfo = new JSONObject();
             locationInfo.put("code", sensorCode.toString());
             locationInfo.put("name", sensorCode.getAddress());
+            locationInfo.put("latitude", sensorCode.getLatitude());
+            locationInfo.put("longitude", sensorCode.getLongitude());
             jsonObject.append("locations", locationInfo);
         }
         return jsonObject.toString();

@@ -69,4 +69,28 @@ public class AirParticulatesService {
     public List<AggregatedParticulates> findByDateBetweenAndSensorCodeIn(Date from, Date to, List<SensorCode> sensorCodes) {
         return airParticulatesRepository.aggregateByDay(from, to, sensorCodes);
     }
+
+    public List<JSONObject> getRecentParticulatesList(){
+        List<SensorCode> sensorCodeList = Arrays.stream(SensorCode.values()).toList();
+        List<JSONObject> jsonObjectList = new LinkedList<>();
+
+        for (SensorCode sensorCode : sensorCodeList) {
+            AirParticulates recent = airParticulatesRepository.findFirstByDateBeforeAndCode(new Date(), sensorCode);
+            if(recent == null) continue;
+            JSONObject json = new JSONObject();
+            json.put("sensorCode", sensorCode.name());
+            json.put("latitude", sensorCode.getLatitude());
+            json.put("longitude", sensorCode.getLongitude());
+            json.put("co", recent.getCO());
+            json.put("no2", recent.getNO2());
+            json.put("pm10", recent.getPM10());
+            json.put("pm25", recent.getPM25());
+            json.put("o3", recent.getO3());
+            json.put("so2", recent.getSO2());
+            json.put("date", recent.getDate());
+            jsonObjectList.add(json);
+        }
+
+        return jsonObjectList;
+    }
 }
