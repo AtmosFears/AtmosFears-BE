@@ -26,4 +26,6 @@ public interface AirParticulatesRepository extends MongoRepository<AirParticulat
     List<AggregatedParticulates> aggregateByDay(Date from, Date to, List<SensorCode> sensorCode);
 
 
+    AirParticulates findFirstByDateBeforeAndCode(Date date, SensorCode code);
+
 }

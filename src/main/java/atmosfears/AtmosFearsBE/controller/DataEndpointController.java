@@ -1,5 +1,7 @@
 package atmosfears.AtmosFearsBE.controller;
 
+import atmosfears.AtmosFearsBE.database.SensorCode;
+import atmosfears.AtmosFearsBE.model.AirParticulates;
 import atmosfears.AtmosFearsBE.service.AirParticulatesService;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -35,5 +39,10 @@ public class DataEndpointController {
             return ResponseEntity.internalServerError().build();
         }
         return ResponseEntity.ok(airParticulatesService.getAverageParticulatesValues(startDate, endDate).toMap());
+    }
+
+    @GetMapping("/data/recent")
+    public ResponseEntity<List<Map<String, Object>>> getRecentParticulates(){
+        return ResponseEntity.ok(airParticulatesService.getRecentParticulatesList().stream().map(JSONObject::toMap).toList());
     }
 }
