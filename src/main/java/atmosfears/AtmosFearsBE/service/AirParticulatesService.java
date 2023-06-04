@@ -64,6 +64,10 @@ public class AirParticulatesService {
         return json;
     }
 
+    public List<AirParticulates> findByDateBetween(Date from, Date to){
+        return airParticulatesRepository.findByDateBetween(from, to);
+    }
+
     public List<AirParticulates> findByDateBetweenAndSensorCodeIn(Date from, Date to, List<SensorCode> sensorCodes) {
         return airParticulatesRepository.findByDateBetweenAndSensorCodeIn(from, to, sensorCodes);
     }
