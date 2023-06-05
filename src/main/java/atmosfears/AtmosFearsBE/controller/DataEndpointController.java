@@ -5,6 +5,7 @@ import atmosfears.AtmosFearsBE.model.AirParticulates;
 import atmosfears.AtmosFearsBE.service.AirParticulatesService;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,7 @@ public class DataEndpointController {
     }
 
 
+    @CrossOrigin()
     @GetMapping("/data/average")
     public ResponseEntity<Map<String, Object>> getAverageParticulates(@RequestParam(name = "start") String startDateStr,
                                                       @RequestParam(name = "end") String endDateStr){
@@ -41,6 +43,7 @@ public class DataEndpointController {
         return ResponseEntity.ok(airParticulatesService.getAverageParticulatesValues(startDate, endDate).toMap());
     }
 
+    @CrossOrigin()
     @GetMapping("/data/recent")
     public ResponseEntity<List<Map<String, Object>>> getRecentParticulates(){
         return ResponseEntity.ok(airParticulatesService.getRecentParticulatesList().stream().map(JSONObject::toMap).toList());
