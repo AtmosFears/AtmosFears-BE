@@ -1,10 +1,11 @@
 package atmosfears.AtmosFearsBE.controller;
 
 import atmosfears.AtmosFearsBE.database.Particulate;
-import atmosfears.AtmosFearsBE.database.SensorCode;
+import atmosfears.AtmosFearsBE.database.Sensor;
 import atmosfears.AtmosFearsBE.model.AggregatedParticulates;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
 import atmosfears.AtmosFearsBE.service.AirParticulatesService;
+import atmosfears.AtmosFearsBE.service.SensorsProvider;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.json.JSONObject;
@@ -19,7 +20,7 @@ import java.util.*;
 @RequestMapping("/api/timeseries")
 public class TimeSeriesController {
 
-    final AirParticulatesService airParticulatesService;
+    private final AirParticulatesService airParticulatesService;
 
     public TimeSeriesController(AirParticulatesService airParticulatesService) {
         this.airParticulatesService = airParticulatesService;
@@ -29,12 +30,12 @@ public class TimeSeriesController {
     @GetMapping(value = "/locations", produces = "application/json")
     public String stations() {
         JSONObject jsonObject = new JSONObject();
-        for (SensorCode sensorCode : SensorCode.values()) {
+        for (Sensor sensor : SensorsProvider.getInstance().values()) {
             JSONObject locationInfo = new JSONObject();
-            locationInfo.put("code", sensorCode.toString());
-            locationInfo.put("name", sensorCode.getAddress());
-            locationInfo.put("latitude", sensorCode.getLatitude());
-            locationInfo.put("longitude", sensorCode.getLongitude());
+            locationInfo.put("code", sensor.toString());
+            locationInfo.put("name", sensor.getAddress());
+            locationInfo.put("latitude", sensor.getLatitude());
+            locationInfo.put("longitude", sensor.getLongitude());
             jsonObject.append("locations", locationInfo);
         }
         return jsonObject.toString();
@@ -49,7 +50,7 @@ public class TimeSeriesController {
             @RequestParam(name = "pollution2", required = false) String pollution2,
             @RequestParam(value = "sensors") String[] sensors
     ) {
-        List<SensorCode> codeList = Arrays.stream(sensors).map(SensorCode::valueOf).toList();
+        List<Sensor> codeList = Arrays.stream(sensors).map(val -> SensorsProvider.getInstance().valueOf(val)).toList();
         List<AggregatedParticulates> aggregatedParticulates =
                 airParticulatesService.findByDateBetweenAndSensorCodeIn(from, to, codeList);
 
@@ -70,7 +71,7 @@ public class TimeSeriesController {
                 sensorParticulateJson.put("PM10", sensorParticulate.getPM10());
                 sensorParticulateJson.put("PM25", sensorParticulate.getPM25());
                 sensorParticulateJson.put("SO2", sensorParticulate.getSO2());
-                aggregatedSensors.put(sensorParticulate.getCode().toString(), sensorParticulateJson);
+                aggregatedSensors.put(sensorParticulate.getCode(), sensorParticulateJson);
             }
             aggregatedJson.put("sensors", aggregatedSensors);
 

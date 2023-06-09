@@ -1,9 +1,8 @@
 package atmosfears.AtmosFearsBE.service;
 
-import atmosfears.AtmosFearsBE.database.AirParticulatesFileRepository;
 import atmosfears.AtmosFearsBE.database.AirParticulatesRepository;
 import atmosfears.AtmosFearsBE.database.Particulate;
-import atmosfears.AtmosFearsBE.database.SensorCode;
+import atmosfears.AtmosFearsBE.database.Sensor;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
 import atmosfears.AtmosFearsBE.model.AggregatedParticulates;
 import lombok.AllArgsConstructor;
@@ -66,21 +65,21 @@ public class AirParticulatesService {
         return json;
     }
 
-    public List<AggregatedParticulates> findByDateBetweenAndSensorCodeIn(Date from, Date to, List<SensorCode> sensorCodes) {
-        return airParticulatesRepository.aggregateByDay(from, to, sensorCodes);
+    public List<AggregatedParticulates> findByDateBetweenAndSensorCodeIn(Date from, Date to, List<Sensor> sensors) {
+        return airParticulatesRepository.aggregateByDay(from, to, sensors);
     }
 
     public List<JSONObject> getRecentParticulatesList(){
-        List<SensorCode> sensorCodeList = Arrays.stream(SensorCode.values()).toList();
+        List<Sensor> sensorList = SensorsProvider.getInstance().values();
         List<JSONObject> jsonObjectList = new LinkedList<>();
 
-        for (SensorCode sensorCode : sensorCodeList) {
-            AirParticulates recent = airParticulatesRepository.findFirstByDateBeforeAndCode(new Date(), sensorCode);
+        for (Sensor sensor : sensorList) {
+            AirParticulates recent = airParticulatesRepository.findFirstByDateBeforeAndCode(new Date(), sensor.getCode());
             if(recent == null) continue;
             JSONObject json = new JSONObject();
-            json.put("sensorCode", sensorCode.name());
-            json.put("latitude", sensorCode.getLatitude());
-            json.put("longitude", sensorCode.getLongitude());
+            json.put("sensorCode", sensor.getCode());
+            json.put("latitude", sensor.getLatitude());
+            json.put("longitude", sensor.getLongitude());
             json.put("co", recent.getCO());
             json.put("no2", recent.getNO2());
             json.put("pm10", recent.getPM10());
@@ -88,9 +87,10 @@ public class AirParticulatesService {
             json.put("o3", recent.getO3());
             json.put("so2", recent.getSO2());
             json.put("date", recent.getDate());
+            System.out.println(json);
             jsonObjectList.add(json);
-        }
 
+        }
         return jsonObjectList;
     }
 }

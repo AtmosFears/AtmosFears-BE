@@ -23,9 +23,7 @@ public interface AirParticulatesRepository extends MongoRepository<AirParticulat
                     "{ $sort: { date: 1 } }",
             }
     )
-    List<AggregatedParticulates> aggregateByDay(Date from, Date to, List<SensorCode> sensorCode);
+    List<AggregatedParticulates> aggregateByDay(Date from, Date to, List<Sensor> sensor);
 
-
-    @Query("{'date': {'$gte': ?0, '$lte':?1 }}")
-    List<AirParticulates> findByDateBetween(Date from, Date to);
+    AirParticulates findFirstByDateBeforeAndCode(Date date, String code);
 }

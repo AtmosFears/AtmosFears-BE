@@ -1,0 +1,80 @@
+{
+  "sensors": [{
+      "code": "MpKrakAlKras",
+      "address": "al. Krasińskiego",
+      "latitude": 50.057678,
+      "longitude": 19.926189
+    },
+    {
+      "code": "MpKrakBujaka",
+      "address": "ul. Bujaka",
+      "latitude": 50.010575,
+      "longitude": 19.949189
+    },
+    {
+      "code": "MpKrakBulwar",
+      "address": "ul. Bulwarowa",
+      "latitude": 50.069308,
+      "longitude": 20.053492
+    },
+    {
+      "code": "MpKrakDietla",
+      "address": "ul. Dietla",
+      "latitude": 50.057447,
+      "longitude": 19.946008
+    },
+    {
+      "code": "MpKrakOsPias",
+      "address": "os. Piastów",
+      "latitude": 50.098508,
+      "longitude": 20.018269
+    },
+    {
+      "code": "MpKrakowWIOSPrad6115",
+      "address": "ul. Prądnicka",
+      "latitude": 50.087500,
+      "longitude": 19.926111
+    },
+    {
+      "code": "MpKrakowWSSEKapi6108",
+      "address": "ul. Swoszowice Kąpielowa 70",
+      "latitude": 49.991667,
+      "longitude": 19.935000
+    },
+    {
+      "code": "MpKrakowWSSEPrad6102",
+      "address": "ul. Prądnicka 76",
+      "latitude": 50.087500,
+      "longitude": 19.938056
+    },
+    {
+      "code": "MpKrakowWSSERPod6113",
+      "address": "ul. Rynek Podgórski",
+      "latitude": 50.040000,
+      "longitude": 19.943333
+    },
+    {
+      "code": "MpKrakSwoszo",
+      "address": "ul. Lusińska",
+      "latitude": 49.991442,
+      "longitude": 19.936792
+    },
+    {
+      "code": "MpKrakTelime",
+      "address": "ul. Telimeny 9",
+      "latitude": 50.019036,
+      "longitude": 20.016822
+    },
+    {
+      "code": "MpKrakWadow",
+      "address": "os. Wadów",
+      "latitude": 50.100569,
+      "longitude": 20.122561
+    },
+    {
+      "code": "MpKrakZloRog",
+      "address": "ul. Złoty Róg",
+      "latitude": 50.081197,
+      "longitude": 19.895358
+    }]
+}

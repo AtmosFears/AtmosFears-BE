@@ -1,6 +1,6 @@
 package atmosfears.AtmosFearsBE.model;
 
-import atmosfears.AtmosFearsBE.database.SensorCode;
+import atmosfears.AtmosFearsBE.database.Sensor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.Date;
 public class AirParticulates {
     @Id
     private String id;
-    private SensorCode code;
+    private String code;
     private Date date;
     private Double CO;
     private Double NO2;
