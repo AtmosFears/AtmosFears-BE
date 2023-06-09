@@ -1,6 +1,7 @@
 package atmosfears.AtmosFearsBE.model;
 
 import atmosfears.AtmosFearsBE.database.Sensor;
+import atmosfears.AtmosFearsBE.database.SensorCode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
