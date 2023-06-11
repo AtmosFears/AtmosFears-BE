@@ -1,5 +1,7 @@
 package atmosfears.AtmosFearsBE.database;
 
+import lombok.Getter;
+
 public enum SensorCode {
     MpKrakAlKras("al. Krasińskiego"),
     MpKrakBujaka("ul. Bujaka"),
@@ -15,6 +17,7 @@ public enum SensorCode {
     MpKrakWadow("os. Wadów"),
     MpKrakZloRog("ul. Złoty Róg");
 
+    @Getter
     public final String address;
 
     SensorCode(String address) {
