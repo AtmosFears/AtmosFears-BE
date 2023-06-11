@@ -4,8 +4,12 @@ import atmosfears.AtmosFearsBE.database.AirParticulatesRepository;
 import atmosfears.AtmosFearsBE.database.Particulate;
 import atmosfears.AtmosFearsBE.database.SensorCode;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
+import atmosfears.AtmosFearsBE.model.AirParticulatesWindroseInfo;
+import atmosfears.AtmosFearsBE.model.Direction;
+import atmosfears.AtmosFearsBE.util.AirParticulatesConverter;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +36,17 @@ public class AirParticulatesService {
             return occurrences == 0 ? 0 : valuesSum / occurrences;
         }
     }
+
+    private static final String[] ranges = {
+            "0-1",
+            "1-2",
+            "2-3",
+            "3-4",
+            "4-5",
+            "5-6",
+            "6-7",
+            "7+"
+    };
 
     private final AirParticulatesRepository airParticulatesRepository;
 
@@ -62,6 +77,39 @@ public class AirParticulatesService {
                 json.put(p.name(), averages.get(p).getValue()));
 
         return json;
+    }
+
+    public JSONArray getAggregatedWindroseData(Date startDate, Date endDate, Particulate particulate) {
+        List<AirParticulates> filtered = airParticulatesRepository.findByDateBetween(startDate, endDate);
+
+        List<AirParticulatesWindroseInfo> windroseParametersList = filtered.stream()
+                .map(airParticulates -> AirParticulatesConverter.convertToWindroseParameters(airParticulates, particulate)).toList();
+
+        int totalParameters = windroseParametersList.size();
+
+        double totalPercentage = 0;
+        JSONArray jsonArray = new JSONArray();
+
+        for (Direction direction : Direction.values()) {
+            List<AirParticulatesWindroseInfo> windroseParametersForDirection =
+                    windroseParametersList.stream().filter(windroseParameters -> windroseParameters.getDirection().equals(direction)).toList();
+            double totalForDirectionPercentage = windroseParametersForDirection.size() / (double)totalParameters;
+            totalPercentage += totalForDirectionPercentage;
+            Map<String, Object> chartDataForDirection = new HashMap<>();
+            chartDataForDirection.put("angle", direction.toString());
+            chartDataForDirection.put("total", totalForDirectionPercentage);
+
+            for (String range : ranges) {
+                int index = Arrays.binarySearch(ranges, range);
+                long count = windroseParametersForDirection.stream().filter(windroseParameters -> windroseParameters.getSection() == index).count();
+                double directionRangePercentage = count / (double) totalParameters;
+                chartDataForDirection.put(range, directionRangePercentage);
+            }
+
+            jsonArray.put(chartDataForDirection);
+        }
+        System.out.println(totalPercentage);
+        return jsonArray;
     }
 
     public List<AirParticulates> findByDateBetween(Date from, Date to){
