@@ -1,9 +1,11 @@
 package atmosfears.AtmosFearsBE.controller;
 
+import atmosfears.AtmosFearsBE.database.Particulate;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
 import atmosfears.AtmosFearsBE.service.AirParticulatesService;
 import org.json.JSONObject;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -75,4 +77,30 @@ public class DataEndpointController {
         return ResponseEntity.ok(response);
     }
 
+    @CrossOrigin
+    @GetMapping("/data/windrose/aggr")
+    public ResponseEntity<List<?>> getWindroseData(@RequestParam String pollutant,
+            @RequestParam(name = "start") String startDateStr,
+            @RequestParam(name = "end") String endDateStr) {
+        Date startDate, endDate;
+        try {
+            startDate = convertDate(startDateStr, "yyyy-MM-dd");
+            endDate = convertDate(endDateStr, "yyyy-MM-dd");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+
+        List<Particulate> particulates = Arrays.stream(Particulate.values()).filter(p -> p.toString().equals(pollutant)).toList();
+        if (particulates.size() != 1) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok(airParticulatesService.getAggregatedWindroseData(startDate, endDate, particulates.get(0)).toList());
+    }
+
+    private Date convertDate(String dateStr, String format) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        return simpleDateFormat.parse(dateStr);
+    }
 }
