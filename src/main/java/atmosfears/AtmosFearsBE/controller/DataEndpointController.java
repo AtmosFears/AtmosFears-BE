@@ -1,6 +1,8 @@
 package atmosfears.AtmosFearsBE.controller;
 
+import atmosfears.AtmosFearsBE.model.CustomDateFormat;
 import atmosfears.AtmosFearsBE.service.AirParticulatesService;
+import atmosfears.AtmosFearsBE.service.SensorDataService;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,9 +19,11 @@ import java.util.Map;
 @RestController
 public class DataEndpointController {
 
+    private final SensorDataService sensorDataService;
     private final AirParticulatesService airParticulatesService;
 
-    public DataEndpointController(AirParticulatesService airParticulatesService) {
+    public DataEndpointController(SensorDataService sensorDataService, AirParticulatesService airParticulatesService) {
+        this.sensorDataService = sensorDataService;
         this.airParticulatesService = airParticulatesService;
     }
 
@@ -43,6 +47,18 @@ public class DataEndpointController {
     @CrossOrigin()
     @GetMapping("/data/recent")
     public ResponseEntity<List<Map<String, Object>>> getRecentParticulates(){
-        return ResponseEntity.ok(airParticulatesService.getRecentParticulatesList().stream().map(JSONObject::toMap).toList());
+        return ResponseEntity.ok(sensorDataService.getRecentParticulatesList().stream().map(JSONObject::toMap).toList());
+    }
+
+    @CrossOrigin()
+    @GetMapping("/data/sensors/average")
+    public ResponseEntity<List<Map<String, Object>>> getAverageParticulatesForSensors(
+            @RequestParam(name="format")String dateFormat
+            ){
+        CustomDateFormat format = CustomDateFormat.fromString(dateFormat);
+        if(format == null){
+            return ResponseEntity.ok(sensorDataService.getRecentParticulatesList().stream().map(JSONObject::toMap).toList());
+        }
+        return ResponseEntity.ok(sensorDataService.getAverageParticulatesForSensorsList(format).stream().map(JSONObject::toMap).toList());
     }
 }

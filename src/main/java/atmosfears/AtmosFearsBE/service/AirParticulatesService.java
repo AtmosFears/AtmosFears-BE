@@ -5,6 +5,7 @@ import atmosfears.AtmosFearsBE.database.Particulate;
 import atmosfears.AtmosFearsBE.database.Sensor;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
 import atmosfears.AtmosFearsBE.model.AggregatedParticulates;
+import atmosfears.AtmosFearsBE.model.CustomDateFormat;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
@@ -30,6 +31,7 @@ public class AirParticulatesService {
         }
 
         double getValue() {
+            System.out.println(occurrences == 0 ? 0 : valuesSum / occurrences);
             return occurrences == 0 ? 0 : valuesSum / occurrences;
         }
     }
@@ -67,30 +69,5 @@ public class AirParticulatesService {
 
     public List<AggregatedParticulates> findByDateBetweenAndSensorCodeIn(Date from, Date to, List<Sensor> sensors) {
         return airParticulatesRepository.aggregateByDay(from, to, sensors);
-    }
-
-    public List<JSONObject> getRecentParticulatesList(){
-        List<Sensor> sensorList = SensorsProvider.getInstance().values();
-        List<JSONObject> jsonObjectList = new LinkedList<>();
-
-        for (Sensor sensor : sensorList) {
-            AirParticulates recent = airParticulatesRepository.findFirstByDateBeforeAndCode(new Date(), sensor.getCode());
-            if(recent == null) continue;
-            JSONObject json = new JSONObject();
-            json.put("sensorCode", sensor.getCode());
-            json.put("latitude", sensor.getLatitude());
-            json.put("longitude", sensor.getLongitude());
-            json.put("co", recent.getCO());
-            json.put("no2", recent.getNO2());
-            json.put("pm10", recent.getPM10());
-            json.put("pm25", recent.getPM25());
-            json.put("o3", recent.getO3());
-            json.put("so2", recent.getSO2());
-            json.put("date", recent.getDate());
-            System.out.println(json);
-            jsonObjectList.add(json);
-
-        }
-        return jsonObjectList;
     }
 }
