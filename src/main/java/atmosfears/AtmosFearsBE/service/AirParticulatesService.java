@@ -138,7 +138,5 @@ public class AirParticulatesService {
         return airParticulatesRepository.findByDateBetween(from, to);
     }
 
-    public List<AirParticulates> findByDateBetweenAndSensorCodeIn(Date from, Date to, List<SensorCode> sensorCodes) {
-        return airParticulatesRepository.findByDateBetweenAndSensorCodeIn(from, to, sensorCodes);
-    }
+
 }
