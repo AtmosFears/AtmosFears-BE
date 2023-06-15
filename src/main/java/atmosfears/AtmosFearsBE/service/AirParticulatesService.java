@@ -4,16 +4,17 @@ import atmosfears.AtmosFearsBE.database.AirParticulatesRepository;
 import atmosfears.AtmosFearsBE.database.Particulate;
 import atmosfears.AtmosFearsBE.database.SensorCode;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
+import atmosfears.AtmosFearsBE.model.AggregatedParticulates;
 import atmosfears.AtmosFearsBE.model.AirParticulatesWindroseInfo;
 import atmosfears.AtmosFearsBE.model.Direction;
 import atmosfears.AtmosFearsBE.util.AirParticulatesConverter;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -58,25 +59,46 @@ public class AirParticulatesService {
         airParticulatesRepository.insert(new AirParticulates());
     }
 
-    public JSONObject getAverageParticulatesValues(Date startDate, Date endDate) {
-        Map<Particulate, AverageParticulateCounter> averages = new HashMap<>();
-        Arrays.stream(Particulate.values()).forEach(p -> averages.put(p, new AverageParticulateCounter(p)));
-
+    public JSONArray getAverageParticulatesValues(Date startDate, Date endDate) {
         List<AirParticulates> filtered = airParticulatesRepository.findByDateBetween(startDate, endDate);
+        Set<String> locations = filtered.stream().map(AirParticulates::getCode).map(Enum::toString).collect(Collectors.toSet());
+
+        Map<String, Map<Particulate, AverageParticulateCounter>> averagesForLocations = new HashMap<>();
+        for (String location : locations) {
+            averagesForLocations.put(location, new HashMap<>());
+            Arrays.stream(Particulate.values()).forEach(p -> averagesForLocations.get(location).put(p, new AverageParticulateCounter(p)));
+        }
+
+        System.out.println(locations);
+
         filtered.forEach(airParticulates -> {
+            String location = airParticulates.getCode().toString();
+            Map<Particulate, AverageParticulateCounter> averages = averagesForLocations.get(location);
             averages.get(Particulate.CO).addValue(airParticulates.getCO());
             averages.get(Particulate.NO2).addValue(airParticulates.getNO2());
             averages.get(Particulate.O3).addValue(airParticulates.getO3());
             averages.get(Particulate.PM10).addValue(airParticulates.getPM10());
             averages.get(Particulate.PM25).addValue(airParticulates.getPM25());
             averages.get(Particulate.SO2).addValue(airParticulates.getSO2());
+            averagesForLocations.put(location, averages);
         });
 
-        JSONObject json = new JSONObject();
-        Arrays.stream(Particulate.values()).forEach(p ->
-                json.put(p.name(), averages.get(p).getValue()));
+        JSONArray jsonArray = new JSONArray();
 
-        return json;
+        for (String location : locations) {
+            Map<String, Object> locationProperties = new HashMap<>();
+            Map<Particulate, AverageParticulateCounter> averages = averagesForLocations.get(location);
+            locationProperties.put("location", SensorCode.valueOf(location).getAddress());
+            for (Particulate p : averages.keySet()) {
+                locationProperties.put(p.name(), averages.get(p).getValue());
+            }
+            jsonArray.put(locationProperties);
+        }
+        return jsonArray;
+    }
+
+    public List<AggregatedParticulates> findByDateBetweenAndSensorCodeIn(Date from, Date to, List<SensorCode> sensorCodes) {
+        return airParticulatesRepository.aggregateByDay(from, to, sensorCodes);
     }
 
     public JSONArray getAggregatedWindroseData(Date startDate, Date endDate, Particulate particulate) {

@@ -3,43 +3,45 @@ package atmosfears.AtmosFearsBE.controller;
 import atmosfears.AtmosFearsBE.database.Particulate;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
 import atmosfears.AtmosFearsBE.service.AirParticulatesService;
-import org.json.JSONObject;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 @RestController
 public class DataEndpointController {
 
-    private AirParticulatesService airParticulatesService;
+    private final AirParticulatesService airParticulatesService;
 
     public DataEndpointController(AirParticulatesService airParticulatesService) {
         this.airParticulatesService = airParticulatesService;
     }
 
-
     @CrossOrigin
     @GetMapping("/data/average")
-    public ResponseEntity<Map<String, Object>> getAverageParticulates(@RequestParam(name = "start") String startDateStr,
-                                                      @RequestParam(name = "end") String endDateStr){
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hh:mm");
+    public ResponseEntity<List<Object>> getAverageParticulates(
+            @RequestParam(name = "start") String startDateStr,
+            @RequestParam(name = "end") String endDateStr) {
         Date startDate, endDate;
         try {
-            startDate = simpleDateFormat.parse(startDateStr);
-            endDate = simpleDateFormat.parse(endDateStr);
+            startDate = convertDate(startDateStr, "yyyy-MM-dd");
+            endDate = convertDate(endDateStr, "yyyy-MM-dd");
         } catch (ParseException e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            List<Object> err = new ArrayList<>(Arrays.asList("Error while parsing date"));
+            return ResponseEntity.internalServerError().body(err);
         }
-        return ResponseEntity.ok(airParticulatesService.getAverageParticulatesValues(startDate, endDate).toMap());
+        return ResponseEntity.ok(airParticulatesService.getAverageParticulatesValues(startDate, endDate).toList());
+    }
+
+    private Date convertDate(String dateStr, String format) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        return simpleDateFormat.parse(dateStr);
     }
 
     @GetMapping("/data/windrose")
@@ -100,8 +102,4 @@ public class DataEndpointController {
         return ResponseEntity.ok(airParticulatesService.getAggregatedWindroseData(startDate, endDate, particulates.get(0)).toList());
     }
 
-    private Date convertDate(String dateStr, String format) throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
-        return simpleDateFormat.parse(dateStr);
-    }
 }
