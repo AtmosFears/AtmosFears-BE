@@ -3,8 +3,8 @@ package atmosfears.AtmosFearsBE.controller;
 import atmosfears.AtmosFearsBE.service.AirParticulatesService;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +22,8 @@ public class DataEndpointController {
 
     @CrossOrigin
     @GetMapping("/data/average")
-    public ResponseEntity<List<Object>> getAverageParticulates(@RequestParam(name = "start") String startDateStr,
+    public ResponseEntity<List<Object>> getAverageParticulates(
+            @RequestParam(name = "start") String startDateStr,
             @RequestParam(name = "end") String endDateStr) {
         Date startDate, endDate;
         try {
@@ -30,7 +31,8 @@ public class DataEndpointController {
             endDate = convertDate(endDateStr, "yyyy-MM-dd");
         } catch (ParseException e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            List<Object> err = new ArrayList<>(Arrays.asList("Error while parsing date"));
+            return ResponseEntity.internalServerError().body(err);
         }
         return ResponseEntity.ok(airParticulatesService.getAverageParticulatesValues(startDate, endDate).toList());
     }
