@@ -46,8 +46,7 @@ public class DataEndpointController {
     public ResponseEntity<Map<String,Object>> getWindroseData(@RequestParam(required = false) Optional<String> pollutant,
                                                               @RequestParam(name = "start") @DateTimeFormat(pattern = "yyyy-MM-dd-hh:mm") Date startDate,
                                                               @RequestParam(name = "end") @DateTimeFormat(pattern = "yyyy-MM-dd-hh:mm") Date endDate){
-        HashMap<String, Object> response = new HashMap<>();
-        response.put("responseList", new ArrayList<Map<String, Object>>());
+        ArrayList<Map<String,Object>> result = new ArrayList<>();
         List<AirParticulates> airParticulatesList =  airParticulatesService.findByDateBetween(startDate, endDate);
         for(AirParticulates airParticulates: airParticulatesList){
             HashMap<String, Object> item = new HashMap<>();
@@ -72,9 +71,11 @@ public class DataEndpointController {
                 item.put("SO2", airParticulates.getSO2());
                 item.put("O3", airParticulates.getO3());
             }
-            ((ArrayList) response.get("responseList")).add(item);
+            result.add(item);
         }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new HashMap<String, Object>(){{
+            put("responseList", result);
+        }});
     }
 
     @CrossOrigin
