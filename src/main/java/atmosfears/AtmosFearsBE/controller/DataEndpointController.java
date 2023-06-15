@@ -14,12 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DataEndpointController {
 
-    private AirParticulatesService airParticulatesService;
+    private final AirParticulatesService airParticulatesService;
 
     public DataEndpointController(AirParticulatesService airParticulatesService) {
         this.airParticulatesService = airParticulatesService;
     }
-
 
     @CrossOrigin
     @GetMapping("/data/average")
