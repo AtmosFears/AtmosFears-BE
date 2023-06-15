@@ -3,7 +3,6 @@ package atmosfears.AtmosFearsBE.service;
 import atmosfears.AtmosFearsBE.database.AirParticulatesRepository;
 import atmosfears.AtmosFearsBE.database.Particulate;
 import atmosfears.AtmosFearsBE.database.SensorCode;
-import atmosfears.AtmosFearsBE.database.SensorCode;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
 import atmosfears.AtmosFearsBE.model.AggregatedParticulates;
 import lombok.AllArgsConstructor;
@@ -12,6 +11,7 @@ import org.json.JSONArray;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
