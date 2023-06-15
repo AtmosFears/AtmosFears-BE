@@ -3,18 +3,15 @@ package atmosfears.AtmosFearsBE.service;
 import atmosfears.AtmosFearsBE.database.AirParticulatesRepository;
 import atmosfears.AtmosFearsBE.database.Particulate;
 import atmosfears.AtmosFearsBE.database.SensorCode;
+import atmosfears.AtmosFearsBE.database.SensorCode;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import atmosfears.AtmosFearsBE.model.AggregatedParticulates;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -84,5 +81,9 @@ public class AirParticulatesService {
             jsonArray.put(locationProperties);
         }
         return jsonArray;
+    }
+
+    public List<AggregatedParticulates> findByDateBetweenAndSensorCodeIn(Date from, Date to, List<SensorCode> sensorCodes) {
+        return airParticulatesRepository.aggregateByDay(from, to, sensorCodes);
     }
 }
