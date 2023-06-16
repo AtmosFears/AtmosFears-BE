@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AirParticulatesWindroseInfo {
 
-  private Direction direction;
+    private Direction direction;
 
-  private Particulate particulate;
+    private Particulate particulate;
 
-  private int section;
+    private int section;
 }

@@ -61,12 +61,19 @@ public class AirParticulatesService {
 
     public JSONArray getAverageParticulatesValues(Date startDate, Date endDate) {
         List<AirParticulates> filtered = airParticulatesRepository.findByDateBetween(startDate, endDate);
-        Set<String> locations = filtered.stream().map(AirParticulates::getCode).map(Enum::toString).collect(Collectors.toSet());
-
+        Set<String> locations = filtered
+                .stream()
+                .map(AirParticulates::getCode)
+                .map(Enum::toString).collect(Collectors.toSet());
         Map<String, Map<Particulate, AverageParticulateCounter>> averagesForLocations = new HashMap<>();
+
         for (String location : locations) {
             averagesForLocations.put(location, new HashMap<>());
-            Arrays.stream(Particulate.values()).forEach(p -> averagesForLocations.get(location).put(p, new AverageParticulateCounter(p)));
+            Arrays.stream(Particulate.values())
+                  .forEach(p -> averagesForLocations
+                          .get(location)
+                          .put(p, new AverageParticulateCounter(p))
+                  );
         }
 
         System.out.println(locations);
@@ -104,8 +111,11 @@ public class AirParticulatesService {
     public JSONArray getAggregatedWindroseData(Date startDate, Date endDate, Particulate particulate) {
         List<AirParticulates> filtered = airParticulatesRepository.findByDateBetween(startDate, endDate);
 
-        List<AirParticulatesWindroseInfo> windroseParametersList = filtered.stream()
-                .map(airParticulates -> AirParticulatesConverter.convertToWindroseParameters(airParticulates, particulate)).toList();
+        List<AirParticulatesWindroseInfo> windroseParametersList = filtered
+                .stream()
+                .map(airParticulates -> AirParticulatesConverter
+                        .convertToWindroseParameters(airParticulates, particulate)
+                ).toList();
 
         int totalParameters = windroseParametersList.size();
 
@@ -114,8 +124,12 @@ public class AirParticulatesService {
 
         for (Direction direction : Direction.values()) {
             List<AirParticulatesWindroseInfo> windroseParametersForDirection =
-                    windroseParametersList.stream().filter(windroseParameters -> windroseParameters.getDirection().equals(direction)).toList();
-            double totalForDirectionPercentage = windroseParametersForDirection.size() / (double)totalParameters;
+                    windroseParametersList
+                            .stream()
+                            .filter(windroseParameters -> windroseParameters.getDirection().equals(direction))
+                            .toList();
+
+            double totalForDirectionPercentage = windroseParametersForDirection.size() / (double) totalParameters;
             totalPercentage += totalForDirectionPercentage;
             Map<String, Object> chartDataForDirection = new HashMap<>();
             chartDataForDirection.put("angle", direction.toString());
@@ -123,7 +137,11 @@ public class AirParticulatesService {
 
             for (String range : ranges) {
                 int index = Arrays.binarySearch(ranges, range);
-                long count = windroseParametersForDirection.stream().filter(windroseParameters -> windroseParameters.getSection() == index).count();
+                long count = windroseParametersForDirection
+                        .stream()
+                        .filter(windroseParameters -> windroseParameters.getSection() == index)
+                        .count();
+
                 double directionRangePercentage = count / (double) totalParameters;
                 chartDataForDirection.put(range, directionRangePercentage);
             }
@@ -137,6 +155,4 @@ public class AirParticulatesService {
     public List<AirParticulates> findByDateBetween(Date from, Date to){
         return airParticulatesRepository.findByDateBetween(from, to);
     }
-
-
 }
