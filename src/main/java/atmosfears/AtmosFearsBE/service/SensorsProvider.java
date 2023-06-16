@@ -15,6 +15,7 @@ public class SensorsProvider {
     private static final String sensorsFilePath = "data/sensors.json";
     private static final SensorsProvider instance = new SensorsProvider();
     private final List<Sensor> sensors = new LinkedList<>();
+
     private SensorsProvider() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(sensorsFilePath);
         assert inputStream != null;
@@ -45,7 +46,10 @@ public class SensorsProvider {
     }
 
     public Sensor valueOf(String code){
-        Optional<Sensor> optionalSensor = sensors.stream().filter(value -> Objects.equals(value.code, code)).findAny();
+        Optional<Sensor> optionalSensor = sensors
+                .stream()
+                .filter(value -> Objects.equals(value.code(), code))
+                .findAny();
         return optionalSensor.orElse(null);
     }
 }

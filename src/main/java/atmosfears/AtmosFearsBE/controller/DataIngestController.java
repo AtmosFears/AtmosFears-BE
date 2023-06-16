@@ -1,31 +1,26 @@
 package atmosfears.AtmosFearsBE.controller;
 
 import atmosfears.AtmosFearsBE.model.AirParticulatesFile;
-import atmosfears.AtmosFearsBE.service.AirParticulatesService;
 import atmosfears.AtmosFearsBE.service.CalculationService;
 import atmosfears.AtmosFearsBE.service.DataLoadService;
 import java.util.Set;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequestMapping("/api/ingest")
 public class DataIngestController {
 
-  @Autowired
-  DataLoadService dataLoadService;
+  private final DataLoadService dataLoadService;
 
-  @Autowired
-  CalculationService calculationService;
-
-  @Autowired
-  AirParticulatesService airParticulatesService;
+  private final CalculationService calculationService;
 
   @PostMapping("/load")
   public ResponseEntity<String> loadAndPreprocessData() {

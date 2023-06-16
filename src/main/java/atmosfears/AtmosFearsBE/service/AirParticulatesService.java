@@ -5,7 +5,6 @@ import atmosfears.AtmosFearsBE.database.Particulate;
 import atmosfears.AtmosFearsBE.database.Sensor;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
 import atmosfears.AtmosFearsBE.model.AggregatedParticulates;
-import atmosfears.AtmosFearsBE.model.CustomDateFormat;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
@@ -47,11 +46,15 @@ public class AirParticulatesService {
     }
 
     public JSONObject getAverageParticulatesValues(Date startDate, Date endDate) {
+        List<AirParticulates> filtered = airParticulatesRepository.findByDateBetween(startDate, endDate);
+        return createAverageParticulatesValuesJson(filtered);
+    }
+
+    public JSONObject createAverageParticulatesValuesJson(List<AirParticulates>  particulates) {
         Map<Particulate, AverageParticulateCounter> averages = new HashMap<>();
         Arrays.stream(Particulate.values()).forEach(p -> averages.put(p, new AverageParticulateCounter(p)));
 
-        List<AirParticulates> filtered = airParticulatesRepository.findByDateBetween(startDate, endDate);
-        filtered.forEach(airParticulates -> {
+        particulates.forEach(airParticulates -> {
             averages.get(Particulate.CO).addValue(airParticulates.getCO());
             averages.get(Particulate.NO2).addValue(airParticulates.getNO2());
             averages.get(Particulate.O3).addValue(airParticulates.getO3());
@@ -61,8 +64,11 @@ public class AirParticulatesService {
         });
 
         JSONObject json = new JSONObject();
-        Arrays.stream(Particulate.values()).forEach(p ->
-                json.put(p.name(), averages.get(p).getValue()));
+        Arrays.stream(Particulate.values())
+              .forEach(p -> json.put(
+                      p.name().toLowerCase(),
+                      averages.get(p).getValue()
+              ));
 
         return json;
     }

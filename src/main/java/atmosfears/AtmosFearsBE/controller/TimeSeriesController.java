@@ -33,9 +33,9 @@ public class TimeSeriesController {
         for (Sensor sensor : SensorsProvider.getInstance().values()) {
             JSONObject locationInfo = new JSONObject();
             locationInfo.put("code", sensor.toString());
-            locationInfo.put("name", sensor.getAddress());
-            locationInfo.put("latitude", sensor.getLatitude());
-            locationInfo.put("longitude", sensor.getLongitude());
+            locationInfo.put("name", sensor.address());
+            locationInfo.put("latitude", sensor.latitude());
+            locationInfo.put("longitude", sensor.longitude());
             jsonObject.append("locations", locationInfo);
         }
         return jsonObject.toString();
@@ -50,60 +50,72 @@ public class TimeSeriesController {
             @RequestParam(name = "pollution2", required = false) String pollution2,
             @RequestParam(value = "sensors") String[] sensors
     ) {
-        List<Sensor> codeList = Arrays.stream(sensors).map(val -> SensorsProvider.getInstance().valueOf(val)).toList();
+        List<Sensor> codeList = Arrays
+                .stream(sensors)
+                .map(val -> SensorsProvider.getInstance().valueOf(val))
+                .toList();
         List<AggregatedParticulates> aggregatedParticulates =
                 airParticulatesService.findByDateBetweenAndSensorCodeIn(from, to, codeList);
 
+        // Aggregate pollution data
         JSONObject json = new JSONObject();
         json.put("stations", sensors);
         json.put("data", Collections.emptyList());
+
         for (AggregatedParticulates aggregated : aggregatedParticulates) {
-            JSONObject aggregatedJson = new JSONObject();
-            aggregatedJson.put("date", aggregated.getDate().getTime());
-            aggregatedJson.put("displayDate", new SimpleDateFormat("yyyy-MM-dd").format(aggregated.getDate()));
-
-            JSONObject aggregatedSensors = new JSONObject();
-            for (AirParticulates sensorParticulate : aggregated.getValues()) {
-                JSONObject sensorParticulateJson = new JSONObject();
-                sensorParticulateJson.put("CO", sensorParticulate.getCO());
-                sensorParticulateJson.put("NO2", sensorParticulate.getNO2());
-                sensorParticulateJson.put("O3", sensorParticulate.getO3());
-                sensorParticulateJson.put("PM10", sensorParticulate.getPM10());
-                sensorParticulateJson.put("PM25", sensorParticulate.getPM25());
-                sensorParticulateJson.put("SO2", sensorParticulate.getSO2());
-                aggregatedSensors.put(sensorParticulate.getCode(), sensorParticulateJson);
-            }
-            aggregatedJson.put("sensors", aggregatedSensors);
-
-            json.append("data", aggregatedJson);
+            json.append("data", getAggregateParticulateJson(aggregated));
         }
 
+        // Create chart data
         Particulate particulate = Particulate.valueOf(pollution1);
-        JSONObject line = new JSONObject();
-        line.put("dataKey", particulate.name());
-        line.put("stroke", "#8884d8");
-        line.put("yAxisId", "left-axis");
-        json.append("lines", line);
-
-        JSONObject leftAxis = new JSONObject();
-        leftAxis.put("label", particulate.getDisplayName());
-        json.put("leftAxis", leftAxis);
+        json.append("lines", getChartLine(particulate,  "#8884d8", "left-axis"));
+        json.put("leftAxis", getChartAxis(particulate.getDisplayName()));
 
         if (pollution2 != null) {
             Particulate particulate2 = Particulate.valueOf(pollution2);
-            JSONObject line2 = new JSONObject();
-            line2.put("dataKey", particulate2.name());
-            line2.put("stroke", "#441111");
-            line2.put("yAxisId", "right-axis");
-            json.append("lines", line2);
-
-            JSONObject rightAxis = new JSONObject();
-            rightAxis.put("label", particulate2.getDisplayName());
-            json.put("rightAxis", rightAxis);
+            json.append("lines", getChartLine(particulate2, "#441111", "right-axis"));
+            json.put("rightAxis", getChartAxis(particulate2.getDisplayName()));
         }
 
         return json.toString();
     }
 
+    private JSONObject getSensorParticulateJson(AirParticulates sensorParticulate) {
+        JSONObject sensorParticulateJson = new JSONObject();
+        sensorParticulateJson.put("CO", sensorParticulate.getCO());
+        sensorParticulateJson.put("NO2", sensorParticulate.getNO2());
+        sensorParticulateJson.put("O3", sensorParticulate.getO3());
+        sensorParticulateJson.put("PM10", sensorParticulate.getPM10());
+        sensorParticulateJson.put("PM25", sensorParticulate.getPM25());
+        sensorParticulateJson.put("SO2", sensorParticulate.getSO2());
+        return sensorParticulateJson;
+    }
 
+    private JSONObject getAggregateParticulateJson(AggregatedParticulates aggregatedParticulates) {
+        JSONObject aggregatedJson = new JSONObject();
+        aggregatedJson.put("date", aggregatedParticulates.getDate().getTime());
+        aggregatedJson.put("displayDate", new SimpleDateFormat("yyyy-MM-dd")
+                .format(aggregatedParticulates.getDate()));
+        JSONObject aggregatedSensors = new JSONObject();
+
+        for (AirParticulates sensorParticulate : aggregatedParticulates.getValues()) {
+            aggregatedSensors.put(sensorParticulate.getCode(), getSensorParticulateJson(sensorParticulate));
+        }
+        aggregatedJson.put("sensors", aggregatedSensors);
+        return aggregatedJson;
+    }
+
+    private JSONObject getChartLine(Particulate particulate, String color, String axisId) {
+        JSONObject line = new JSONObject();
+        line.put("dataKey", particulate.name());
+        line.put("stroke", color);
+        line.put("yAxisId", axisId);
+        return line;
+    }
+
+    private JSONObject getChartAxis(String label) {
+        JSONObject axis = new JSONObject();
+        axis.put("label", label);
+        return axis;
+    }
 }

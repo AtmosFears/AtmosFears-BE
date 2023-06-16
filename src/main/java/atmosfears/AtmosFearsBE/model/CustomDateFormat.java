@@ -8,7 +8,6 @@ public enum CustomDateFormat {
     month( ChronoUnit.MONTHS, 1),
     year( ChronoUnit.YEARS, 3);
 
-
     private final TemporalUnit unit;
     private final int amount;
     CustomDateFormat(TemporalUnit unit, int amount) {
@@ -34,6 +33,4 @@ public enum CustomDateFormat {
         }
         return  format;
     }
-
-
 }

@@ -22,17 +22,19 @@ public class DataEndpointController {
     private final SensorDataService sensorDataService;
     private final AirParticulatesService airParticulatesService;
 
-    public DataEndpointController(SensorDataService sensorDataService, AirParticulatesService airParticulatesService) {
+    public DataEndpointController(SensorDataService sensorDataService,
+                                  AirParticulatesService airParticulatesService) {
         this.sensorDataService = sensorDataService;
         this.airParticulatesService = airParticulatesService;
     }
 
-
     @CrossOrigin()
     @GetMapping("/data/average")
-    public ResponseEntity<Map<String, Object>> getAverageParticulates(@RequestParam(name = "start") String startDateStr,
-                                                      @RequestParam(name = "end") String endDateStr){
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hh:mm");
+    public ResponseEntity<Map<String, Object>> getAverageParticulates(
+            @RequestParam(name = "start") String startDateStr,
+            @RequestParam(name = "end") String endDateStr) {
+        SimpleDateFormat simpleDateFormat =
+                new SimpleDateFormat("yyyy-MM-dd-hh:mm");
         Date startDate, endDate;
         try {
             startDate = simpleDateFormat.parse(startDateStr);
@@ -41,24 +43,34 @@ public class DataEndpointController {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.ok(airParticulatesService.getAverageParticulatesValues(startDate, endDate).toMap());
+        return ResponseEntity.ok(airParticulatesService.getAverageParticulatesValues(
+                startDate,
+                endDate
+        ).toMap());
     }
 
     @CrossOrigin()
     @GetMapping("/data/recent")
-    public ResponseEntity<List<Map<String, Object>>> getRecentParticulates(){
-        return ResponseEntity.ok(sensorDataService.getRecentParticulatesList().stream().map(JSONObject::toMap).toList());
+    public ResponseEntity<List<Map<String, Object>>> getRecentParticulates() {
+        return ResponseEntity.ok(sensorDataService.getRecentParticulatesList()
+                                                  .stream()
+                                                  .map(JSONObject::toMap)
+                                                  .toList());
     }
 
     @CrossOrigin()
     @GetMapping("/data/sensors/average")
     public ResponseEntity<List<Map<String, Object>>> getAverageParticulatesForSensors(
-            @RequestParam(name="format")String dateFormat
-            ){
+            @RequestParam(name = "format") String dateFormat
+    ) {
         CustomDateFormat format = CustomDateFormat.fromString(dateFormat);
-        if(format == null){
-            return ResponseEntity.ok(sensorDataService.getRecentParticulatesList().stream().map(JSONObject::toMap).toList());
+        if (format == null) {
+            return ResponseEntity.ok(sensorDataService.getRecentParticulatesList()
+                                                      .stream()
+                                                      .map(JSONObject::toMap)
+                                                      .toList());
         }
-        return ResponseEntity.ok(sensorDataService.getAverageParticulatesForSensorsList(format).stream().map(JSONObject::toMap).toList());
+        return ResponseEntity.ok(sensorDataService.getAverageParticulatesForSensorsList(
+                format).stream().map(JSONObject::toMap).toList());
     }
 }
