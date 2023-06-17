@@ -2,6 +2,7 @@ package atmosfears.AtmosFearsBE.controller;
 
 import atmosfears.AtmosFearsBE.database.Particulate;
 import atmosfears.AtmosFearsBE.database.Sensor;
+import atmosfears.AtmosFearsBE.database.SensorCode;
 import atmosfears.AtmosFearsBE.model.AggregatedParticulates;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
 import atmosfears.AtmosFearsBE.service.AirParticulatesService;
@@ -50,10 +51,7 @@ public class TimeSeriesController {
             @RequestParam(name = "pollution2", required = false) String pollution2,
             @RequestParam(value = "sensors") String[] sensors
     ) {
-        List<Sensor> codeList = Arrays
-                .stream(sensors)
-                .map(val -> SensorsProvider.getInstance().valueOf(val))
-                .toList();
+        List<SensorCode> codeList = Arrays.stream(sensors).map(SensorCode::valueOf).toList();
         List<AggregatedParticulates> aggregatedParticulates =
                 airParticulatesService.findByDateBetweenAndSensorCodeIn(from, to, codeList);
 

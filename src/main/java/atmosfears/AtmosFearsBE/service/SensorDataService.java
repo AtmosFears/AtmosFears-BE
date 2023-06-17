@@ -43,7 +43,7 @@ public class SensorDataService {
         return jsonObjectList;
     }
 
-    public List<JSONObject> getAverageParticulatesForSensorsList(CustomDateFormat dateFormat){
+    public List<JSONObject> getAverageParticulatesForSensorsList(CustomDateFormat dateFormat) {
         List<Sensor> sensorList = SensorsProvider.getInstance().values();
         List<JSONObject> jsonObjectList = new LinkedList<>();
         LocalDateTime end = LocalDateTime.now();

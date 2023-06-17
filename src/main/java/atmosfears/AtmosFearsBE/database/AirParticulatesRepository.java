@@ -23,7 +23,7 @@ public interface AirParticulatesRepository extends MongoRepository<AirParticulat
                     "{ $sort: { date: 1 } }",
             }
     )
-    List<AggregatedParticulates> aggregateByDay(Date from, Date to, List<Sensor> sensor);
+    List<AggregatedParticulates> aggregateByDay(Date from, Date to, List<SensorCode> sensorCode);
 
     AirParticulates findFirstByDateBeforeAndCode(Date date, String code);
 

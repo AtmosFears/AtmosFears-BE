@@ -14,21 +14,17 @@ import java.util.stream.DoubleStream;
 @Service
 public class Predictor {
 
+    private static final RCaller rCaller = RCaller.create();
+
     public List<Double> predict(String csv_file_path){
-
-        // TODO odpalanie wspólnego rCallera dla wszystkich wywołań predict'u
-
         // MODEL WILL NOT WORK IF THE NECESSARY R PACKAGES ARE NOT INSTALLED ALONGSIDE R ITSELF
         // For detail about how to install the packages refer to README
 
         // EXAMPLE OF ARGUMENTS IN USE:
         // Predictor predictor = new Predictor();
         // List<Double> pred = predictor.predict("src/main/data/example_sensor_data.csv");
-
         try{
 
-            // R ENVIRONMENT INITIALIZATION
-            RCaller rCaller = RCaller.create();
             RCode code = RCode.create();
 
             // LOADING OF THE LIBRARIES
@@ -59,12 +55,15 @@ public class Predictor {
             // RETRIEVING RESULT
             rCaller.setRCode(code);
             rCaller.runAndReturnResult("out");
-            return DoubleStream.of( rCaller.getParser().getAsDoubleArray("_pred") ).boxed().collect(Collectors.toCollection(ArrayList::new));
-
+            return DoubleStream.of( rCaller.getParser()
+                                            .getAsDoubleArray("_pred") )
+                                .boxed()
+                                .collect(Collectors.toCollection(ArrayList::new));
 
         }
         catch (Exception e) {
-            Logger.getLogger(examples.Main.class.getName()).log(Level.SEVERE, e.getMessage());
+            Logger.getLogger(examples.Main.class.getName())
+                    .log(Level.SEVERE, e.getMessage());
         }
 
         return null;
