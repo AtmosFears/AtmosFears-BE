@@ -57,12 +57,58 @@ public class AirParticulatesService {
         return airParticulatesRepository.findByDateBetween(from, to);
     }
 
-    public JSONObject getAverageParticulatesValues(
-            Date startDate,
-            Date endDate) {
+    public JSONArray getAverageParticulatesValues(Date startDate, Date endDate) {
         List<AirParticulates> filteredParticulates = airParticulatesRepository
                 .findByDateBetween(startDate, endDate);
-        return createAverageParticulatesValuesJson(filteredParticulates);
+        Set<String> locations = getLocations(filteredParticulates);
+        Map<String, Map<Particulate, AverageParticulateCounter>> averagesForLocations = new HashMap<>();
+
+        for (String location : locations) {
+            averagesForLocations.put(location, new HashMap<>());
+            Arrays.stream(Particulate.values())
+                  .forEach(p -> averagesForLocations
+                          .get(location)
+                          .put(p, new AverageParticulateCounter(p))
+                  );
+        }
+
+        filteredParticulates.forEach(airParticulates -> {
+            String location = airParticulates.getCode().toString();
+            Map<Particulate, AverageParticulateCounter> averages = averagesForLocations.get(location);
+            addParticulates(airParticulates, averages);
+            averagesForLocations.put(location, averages);
+        });
+
+        JSONArray jsonArray = new JSONArray();
+
+        for (String location : locations) {
+            Map<String, Object> locationProperties = new HashMap<>();
+            Map<Particulate, AverageParticulateCounter> averages = averagesForLocations.get(location);
+            locationProperties.put("location", SensorCode.valueOf(location).getAddress());
+            for (Particulate p : averages.keySet()) {
+                locationProperties.put(p.name(), averages.get(p).getValue());
+            }
+            jsonArray.put(locationProperties);
+        }
+        return jsonArray;
+    }
+
+    private static void addParticulates(AirParticulates airParticulates,
+                                  Map<Particulate, AverageParticulateCounter> averages) {
+        averages.get(Particulate.CO).addValue(airParticulates.getCO());
+        averages.get(Particulate.NO2).addValue(airParticulates.getNO2());
+        averages.get(Particulate.O3).addValue(airParticulates.getO3());
+        averages.get(Particulate.PM10).addValue(airParticulates.getPM10());
+        averages.get(Particulate.PM25).addValue(airParticulates.getPM25());
+        averages.get(Particulate.SO2).addValue(airParticulates.getSO2());
+    }
+
+    private static Set<String> getLocations(List<AirParticulates> filteredParticulates) {
+        Set<String> locations = filteredParticulates
+                .stream()
+                .map(AirParticulates::getCode)
+                .collect(Collectors.toSet());
+        return locations;
     }
 
     public List<AggregatedParticulates> findByDateBetweenAndSensorCodeIn(
@@ -149,45 +195,12 @@ public class AirParticulatesService {
         return windroseParametersList;
     }
 
-    private Set<String> getLocations(List<AirParticulates> filtered) {
-        return filtered
-                .stream()
-                .map(AirParticulates::getCode)
-                .collect(Collectors.toSet());
-    }
-
-    private static JSONArray createAverageParticulatesValuesResponse(
-            Set<String> locations,
-            Map<String, Map<Particulate, AverageParticulateCounter>> averagesForLocations) {
-        JSONArray jsonArray = new JSONArray();
-
-        for (String location : locations) {
-            Map<String, Object> locationProperties = new HashMap<>();
-            Map<Particulate, AverageParticulateCounter> averages =
-                    averagesForLocations.get(location);
-            locationProperties.put(
-                    "location",
-                    SensorCode.valueOf(location).getAddress()
-            );
-            for (Particulate p : averages.keySet()) {
-                locationProperties.put(p.name(), averages.get(p).getValue());
-            }
-            jsonArray.put(locationProperties);
-        }
-        return jsonArray;
-    }
-
-    public JSONObject createAverageParticulatesValuesJson(List<AirParticulates>  particulates) {
+    public JSONObject createAverageParticulatesValuesJson(List<AirParticulates> particulates) {
         Map<Particulate, AverageParticulateCounter> averages = new HashMap<>();
         Arrays.stream(Particulate.values()).forEach(p -> averages.put(p, new AverageParticulateCounter(p)));
 
         particulates.forEach(airParticulates -> {
-            averages.get(Particulate.CO).addValue(airParticulates.getCO());
-            averages.get(Particulate.NO2).addValue(airParticulates.getNO2());
-            averages.get(Particulate.O3).addValue(airParticulates.getO3());
-            averages.get(Particulate.PM10).addValue(airParticulates.getPM10());
-            averages.get(Particulate.PM25).addValue(airParticulates.getPM25());
-            averages.get(Particulate.SO2).addValue(airParticulates.getSO2());
+            addParticulates(airParticulates, averages);
         });
 
         JSONObject json = new JSONObject();

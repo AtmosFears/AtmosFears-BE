@@ -27,7 +27,7 @@ public class TimeSeriesController {
         this.airParticulatesService = airParticulatesService;
     }
 
-    @CrossOrigin()
+    @CrossOrigin
     @GetMapping(value = "/locations", produces = "application/json")
     public String stations() {
         JSONObject jsonObject = new JSONObject();
@@ -42,7 +42,7 @@ public class TimeSeriesController {
         return jsonObject.toString();
     }
 
-    @CrossOrigin()
+    @CrossOrigin
     @GetMapping(value = "/data", produces = "application/json")
     public String data(
             @RequestParam("dateFrom") @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,

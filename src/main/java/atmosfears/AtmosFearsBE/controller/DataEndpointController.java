@@ -31,28 +31,30 @@ public class DataEndpointController {
         this.sensorDataService = sensorDataService;
     }
 
-    @CrossOrigin()
+    @CrossOrigin
     @GetMapping("/data/average")
-    public ResponseEntity<Map<String, Object>> getAverageParticulates(
+    public ResponseEntity<List<Object>> getAverageParticulates(
             @RequestParam(name = "start") String startDateStr,
             @RequestParam(name = "end") String endDateStr) {
-        SimpleDateFormat simpleDateFormat =
-                new SimpleDateFormat("yyyy-MM-dd-hh:mm");
         Date startDate, endDate;
+
         try {
-            startDate = simpleDateFormat.parse(startDateStr);
-            endDate = simpleDateFormat.parse(endDateStr);
+            startDate = convertDate(startDateStr, "yyyy-MM-dd");
+            endDate = convertDate(endDateStr, "yyyy-MM-dd");
         } catch (ParseException e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            List<Object> err = new ArrayList<>(List.of(
+                    "Error while parsing date"));
+            return ResponseEntity.internalServerError().body(err);
         }
+
         return ResponseEntity.ok(airParticulatesService.getAverageParticulatesValues(
                 startDate,
                 endDate
-        ).toMap());
+        ).toList());
     }
 
-    @CrossOrigin()
+    @CrossOrigin
     @GetMapping("/data/recent")
     public ResponseEntity<List<Map<String, Object>>> getRecentParticulates() {
         return ResponseEntity.ok(sensorDataService.getRecentParticulatesList()
@@ -61,7 +63,7 @@ public class DataEndpointController {
                                                   .toList());
     }
 
-    @CrossOrigin()
+    @CrossOrigin
     @GetMapping("/data/sensors/average")
     public ResponseEntity<List<Map<String, Object>>> getAverageParticulatesForSensors(
             @RequestParam(name = "format") String dateFormat
