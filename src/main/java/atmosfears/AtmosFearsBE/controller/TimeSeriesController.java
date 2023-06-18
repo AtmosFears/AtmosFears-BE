@@ -18,7 +18,7 @@ import java.util.*;
 
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@RequestMapping("/api/timeseries")
+@RequestMapping("/timeseries")
 public class TimeSeriesController {
 
     private final AirParticulatesService airParticulatesService;
@@ -33,7 +33,7 @@ public class TimeSeriesController {
         JSONObject jsonObject = new JSONObject();
         for (Sensor sensor : SensorsProvider.getInstance().values()) {
             JSONObject locationInfo = new JSONObject();
-            locationInfo.put("code", sensor.toString());
+            locationInfo.put("code", sensor.code());
             locationInfo.put("name", sensor.address());
             locationInfo.put("latitude", sensor.latitude());
             locationInfo.put("longitude", sensor.longitude());

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@RequestMapping("/api/ingest")
+@RequestMapping("/ingest")
 public class DataIngestController {
 
   private final DataLoadService dataLoadService;
