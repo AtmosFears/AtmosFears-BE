@@ -2,12 +2,15 @@ package atmosfears.AtmosFearsBE.controller;
 
 import atmosfears.AtmosFearsBE.database.Particulate;
 import atmosfears.AtmosFearsBE.model.AirParticulates;
+import atmosfears.AtmosFearsBE.model.CustomDateFormat;
 import atmosfears.AtmosFearsBE.service.AirParticulatesService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import atmosfears.AtmosFearsBE.service.SensorDataService;
+import org.json.JSONObject;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class DataEndpointController {
 
     private final AirParticulatesService airParticulatesService;
+    private final SensorDataService sensorDataService;
 
-    public DataEndpointController(AirParticulatesService airParticulatesService) {
+    public DataEndpointController(AirParticulatesService airParticulatesService,
+                                  SensorDataService sensorDataService) {
         this.airParticulatesService = airParticulatesService;
+        this.sensorDataService = sensorDataService;
     }
 
     @CrossOrigin
@@ -48,10 +54,29 @@ public class DataEndpointController {
         ).toList());
     }
 
-    private Date convertDate(String dateStr, String format)
-            throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
-        return simpleDateFormat.parse(dateStr);
+    @CrossOrigin
+    @GetMapping("/data/recent")
+    public ResponseEntity<List<Map<String, Object>>> getRecentParticulates() {
+        return ResponseEntity.ok(sensorDataService.getRecentParticulatesList()
+                                                  .stream()
+                                                  .map(JSONObject::toMap)
+                                                  .toList());
+    }
+
+    @CrossOrigin
+    @GetMapping("/data/sensors/average")
+    public ResponseEntity<List<Map<String, Object>>> getAverageParticulatesForSensors(
+            @RequestParam(name = "format") String dateFormat
+    ) {
+        CustomDateFormat format = CustomDateFormat.fromString(dateFormat);
+        if (format == null) {
+            return ResponseEntity.ok(sensorDataService.getRecentParticulatesList()
+                                                      .stream()
+                                                      .map(JSONObject::toMap)
+                                                      .toList());
+        }
+        return ResponseEntity.ok(sensorDataService.getAverageParticulatesForSensorsList(
+                format).stream().map(JSONObject::toMap).toList());
     }
 
     @GetMapping("/data/windrose")
@@ -86,7 +111,8 @@ public class DataEndpointController {
                     item.put("SO2", airParticulates.getSO2());
                 else if (pollutant.get().equals("O3"))
                     item.put("O3", airParticulates.getO3());
-                else return ResponseEntity.badRequest().build();
+                else
+                    return ResponseEntity.badRequest().build();
             } else {
                 item.put("PM10", airParticulates.getPM10());
                 item.put("PM25", airParticulates.getPM25());
@@ -98,9 +124,11 @@ public class DataEndpointController {
             result.add(item);
         }
 
-        return ResponseEntity.ok(new HashMap<String, Object>() {{
-            put("responseList", result);
-        }});
+        return ResponseEntity.ok(new HashMap<String, Object>() {
+            {
+                put("responseList", result);
+            }
+        });
     }
 
     @CrossOrigin
@@ -131,5 +159,11 @@ public class DataEndpointController {
                 endDate,
                 particulates.get(0)
         ).toList());
+    }
+
+    private Date convertDate(String dateStr, String format)
+            throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        return simpleDateFormat.parse(dateStr);
     }
 }
