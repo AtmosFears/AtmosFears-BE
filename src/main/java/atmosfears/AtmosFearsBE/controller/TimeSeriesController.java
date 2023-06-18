@@ -18,7 +18,7 @@ import java.util.*;
 
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@RequestMapping("/api/timeseries")
+@RequestMapping("/timeseries")
 public class TimeSeriesController {
 
     private final AirParticulatesService airParticulatesService;
